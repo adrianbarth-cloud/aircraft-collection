@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0e13">
+<title>Aircraft Collection V8.3</title>
+<style>
+:root{--bg:#0b0e13;--card:#131821;--line:#28303c;--text:#f4f7fb;--muted:#8f9aaa;--accent:#7dd3fc;--danger:#fb7185}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input{font:inherit}
+button{touch-action:manipulation}
+.app{max-width:760px;margin:auto;padding-bottom:110px}
+.top{padding:24px 18px 10px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:800;font-size:21px}.small,.muted{color:var(--muted)}
+.hero{padding:25px 18px 12px}.hero h1{font-size:38px;line-height:1.05;margin:0 0 8px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 18px 18px}
+.stat,.post,.ach,.rankbox,.feature,.metric,.most,.airline,.airlinehero,.airlinecard{background:var(--card);border:1px solid var(--line);border-radius:16px}
+.stat{padding:15px}.stat b{display:block;font-size:28px}
+.add{margin:0 18px 18px;width:calc(100% - 36px);padding:14px;border:0;border-radius:14px;background:var(--text);font-weight:800;color:#0b0e13;cursor:pointer}
+.post{margin:0 18px 18px;overflow:hidden;cursor:pointer;position:relative}
+.photos,.detailphotos{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+.photos::-webkit-scrollbar,.detailphotos::-webkit-scrollbar{display:none}
+.photos img,.placeholder,.detailphotos img{width:100%;aspect-ratio:1;object-fit:cover;flex:0 0 100%;scroll-snap-align:start;background:#253241}
+.dots{position:absolute;top:12px;right:12px;background:#000a;padding:5px 9px;border-radius:99px;font-size:12px}
+.photos{position:relative}.postbody{padding:13px 16px 16px}.postbody b{font-size:18px}.sub{color:var(--muted);margin-top:4px}.tap{color:var(--accent);font-size:12px;margin-top:9px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.grid button{padding:0;border:0;background:none;position:relative;cursor:pointer}
+.grid img,.grid .placeholder{width:100%;aspect-ratio:1;object-fit:cover;display:block}
+.gridlabel{position:absolute;left:5px;right:5px;bottom:5px;padding:5px;border-radius:7px;background:#0009;color:#fff;font-size:10px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{margin:20px 18px;padding:35px 20px;text-align:center;border:1px dashed var(--line);border-radius:16px;color:var(--muted)}
+.form{padding:0 18px}.field{margin-bottom:14px}.field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+.field input{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+.drop{padding:20px;text-align:center;border:1px dashed var(--line);border-radius:13px;color:var(--muted)}
+.preview{display:flex;gap:8px;overflow:auto;margin:9px 0 16px}.thumb{position:relative;flex:0 0 105px}.thumb img{width:105px;height:105px;object-fit:cover;border-radius:10px}
+.thumb button{position:absolute;right:3px;top:3px;border:0;border-radius:50%;width:25px;height:25px;background:#000b;color:#fff;cursor:pointer}
+.primary{width:100%;padding:14px;border:0;border-radius:13px;background:var(--text);font-weight:800;color:#0b0e13;cursor:pointer}
+.secondary{background:var(--card);color:var(--text);border:1px solid var(--line);padding:9px;border-radius:10px;cursor:pointer}.danger{color:var(--danger)}
+.nav{position:fixed;z-index:20;bottom:0;left:0;right:0;background:#10151d;border-top:1px solid var(--line);display:flex;justify-content:center;gap:5px;padding:9px 5px calc(9px + env(safe-area-inset-bottom))}
+.nav button{background:none;border:0;color:var(--muted);padding:7px 12px;border-radius:12px;font-size:11px;cursor:pointer}
+.nav button.active{color:var(--text);background:#1b2430}.nav span{display:block;font-size:20px}.page{display:none}.page.active{display:block}
+.ach{margin:0 18px 12px;padding:16px}.ach.locked{opacity:.58}.bar{height:7px;background:#252c37;border-radius:99px;margin-top:10px;overflow:hidden}.bar i{display:block;height:100%;border-radius:99px}
+.rarity{font-size:10px;border:1px solid var(--line);padding:3px 7px;border-radius:99px;color:var(--muted)}
+.rankbox{margin:0 18px 14px;padding:18px;position:relative;overflow:hidden;cursor:pointer}.rankaccent{position:absolute;left:0;top:0;bottom:0;width:4px}
+.rankpill{display:inline-flex;padding:5px 9px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.08em;border:1px solid}
+.questtitle,.section-label{padding:4px 18px 9px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.1em}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 16px}.feature{padding:15px;text-align:left;color:var(--text);min-height:86px;cursor:pointer}
+.feature span{font-size:24px;display:block}.feature b{display:block;margin-top:5px}.feature small{color:var(--muted)}
+.metric-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 18px 16px}.metric{padding:16px}.metric .num{font-size:31px;font-weight:800}
+.most{margin:0 18px 16px;padding:16px}.mostline{display:flex;justify-content:space-between;padding:12px 0;border-top:1px solid var(--line)}.mostline:first-child{border-top:0}
+.airline-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px}.airline{padding:15px}
+.airline .big{font-size:25px;font-weight:800;margin:6px 0}.subpage{display:none}.subpage.show{display:block}
+.subhead{display:flex;align-items:center;gap:10px;padding:0 18px 14px}.subhead h2{margin:0;font-size:32px}
+.modal,.rankmodal,.confirm{position:fixed;inset:0;background:#000e;z-index:30;display:none}
+.modal.show{display:block;overflow:auto}.modalbox{min-height:100%;background:var(--bg)}
+.modalhead{position:sticky;top:0;background:#0b0e13ee;backdrop-filter:blur(10px);padding:12px 18px;display:flex;justify-content:space-between;align-items:center;z-index:2}
+.detailbody{padding:20px}.chips{display:flex;gap:7px;flex-wrap:wrap;margin:15px 0}.chip{border:1px solid var(--line);padding:8px 10px;border-radius:12px;color:var(--muted)}.actions{display:flex;gap:9px}
+.rankmodal{align-items:flex-end;justify-content:center}.rankmodal.show{display:flex}.rankmodalbox{width:min(760px,100%);max-height:92vh;background:var(--card);border:1px solid var(--line);border-radius:22px 22px 0 0;overflow:hidden}
+.rankmodalhead{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}.rankslider{overflow:hidden;touch-action:pan-y}.ranktrack{display:flex;transition:transform .25s}
+.rankcard{min-width:100%;padding:22px 18px 30px;max-height:calc(92vh - 60px);overflow:auto;border-left:4px solid}.rankicon{font-size:48px}
+.req{display:flex;justify-content:space-between;padding:12px;border:1px solid var(--line);border-radius:12px;margin-top:8px}.req.done{border-color:var(--rank-accent)}.check{color:var(--rank-accent);font-weight:900}
+.rankdots{display:flex;justify-content:center;gap:5px;padding:9px}.rankdots i{width:6px;height:6px;border-radius:50%;background:var(--line)}.rankdots i.active{width:18px;border-radius:99px}
+.confirm{align-items:flex-end;justify-content:center;padding:18px}.confirm.show{display:flex}.confirmbox{width:min(500px,100%);background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.confirmactions{display:flex;gap:9px;margin-top:16px}.confirmactions button{flex:1}.toast{position:fixed;z-index:60;left:18px;right:18px;bottom:88px;padding:14px 16px;border-radius:14px;background:#16231c;border:1px solid #2d5940;color:#d9ffe5;display:none;box-shadow:0 10px 30px #0007}.toast.show{display:block}
+
+.airlinehero{display:block;margin:0 18px 20px;width:calc(100% - 36px);min-height:230px;padding:0;overflow:hidden;position:relative;text-align:left;cursor:pointer;background:linear-gradient(145deg,#151b25,#0f141c)}
+.airlinehero::after{content:'✈';position:absolute;right:-15px;bottom:-35px;font-size:180px;opacity:.035;transform:rotate(-8deg);pointer-events:none}
+.airlineheroimg{height:150px;position:relative;overflow:hidden;background:#202936}
+.airlineheroimg img{width:100%;height:100%;display:block;object-fit:cover;opacity:.58;filter:saturate(.7)}
+.airlineheroimg .shade{position:absolute;inset:0;background:linear-gradient(transparent,#10151de8);pointer-events:none}
+.airlineheroinfo{position:absolute;left:18px;right:18px;bottom:14px;z-index:1}
+.airlinecode{font-size:12px;letter-spacing:.18em;color:var(--muted);font-weight:800}.airlinename{font-size:28px;font-weight:850;margin:3px 0}
+.airlineherofoot{display:flex;gap:18px;color:var(--muted);font-size:12px}.airlineherofoot b{color:var(--text);font-size:14px}
+.airlinecards{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 18px 18px}
+.airlinecard{display:block;min-height:160px;border-radius:18px;overflow:hidden;position:relative;background:linear-gradient(145deg,var(--card),#0f141b);cursor:pointer;color:var(--text);text-align:left;padding:0}
+.airlinecardphoto{height:82px;background:#202936;position:relative;overflow:hidden}.airlinecardphoto img{width:100%;height:100%;display:block;object-fit:cover;opacity:.48;filter:saturate(.65)}
+.airlinecardphoto::after{content:'';position:absolute;inset:0;background:linear-gradient(transparent,var(--card));pointer-events:none}
+.airlinecardbody{position:absolute;left:13px;right:13px;bottom:12px}.airlinebadge{display:inline-flex;border:1px solid #ffffff22;background:#ffffff08;padding:4px 7px;border-radius:7px;font-size:10px;letter-spacing:.12em;font-weight:800;color:var(--muted)}
+.airlinecardbody b{display:block;font-size:16px;margin:6px 0 3px}.airlinemeta{font-size:11px;color:var(--muted)}
+.airlinedetailhero{margin:0 18px 16px;padding:18px;border-radius:20px;border:1px solid var(--line);background:linear-gradient(145deg,var(--card),#111720)}
+.airlinedetailhero h2{font-size:30px;margin:4px 0}.airlinedetailhero .big{font-size:13px;color:var(--muted)}
+.collectionlabel{padding:0 18px 9px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.1em}
+.airlineheroempty,.airlinecardempty{height:100%;display:flex;align-items:center;justify-content:center;color:#ffffff22;font-size:48px}.airlinecardempty{font-size:30px}
+.airlineempty{margin:0 18px 20px}
+@media(max-width:599px){.subhead{align-items:center}.subhead h2{font-size:30px}}
+@media(min-width:600px){.confirm{align-items:center}.rankmodal{align-items:center}.rankmodalbox{border-radius:22px}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand">✈ Aircraft Collection <span class="small">V8.3</span></div><div id="countTop" class="small"></div></header>
+
+<section id="dashboard" class="page active">
+<div class="hero"><h1>Deine Sammlung</h1><div class="muted">Deine neuesten Aircraft zuerst.</div></div>
+<div class="stats"><div class="stat"><span class="muted">Aircraft</span><b id="aircraftCount">0</b></div><div class="stat"><span class="muted">Fotos</span><b id="photoCount">0</b></div></div>
+<button class="add" onclick="showPage('add')">＋ Flugzeug hinzufügen</button><div id="milestoneBox"></div><div id="feed"></div>
+</section>
+
+<section id="collection" class="page"><div class="hero"><h1>Sammlung</h1><div class="muted" id="resultCount"></div></div><div id="collectionContent"></div></section>
+
+<section id="add" class="page"><div class="hero"><h1 id="formTitle">Neues Flugzeug</h1><div class="muted">Alle Angaben sind optional. Mindestens ein Foto oder eine Angabe ist nötig.</div></div>
+<form id="aircraftForm" class="form" onsubmit="publish(event)">
+<div class="field"><label>Fotos</label><div class="drop"><input id="files" type="file" accept="image/*" multiple onchange="previewFiles(event)"></div><div id="preview" class="preview"></div></div>
+<div class="field"><label>Hersteller</label><input id="manufacturer" placeholder="z. B. Airbus"></div><div class="field"><label>Modell</label><input id="model" placeholder="z. B. A350"></div><div class="field"><label>Variante</label><input id="variant" placeholder="z. B. A350-900"></div><div class="field"><label>Airline</label><input id="airline" placeholder="z. B. Lufthansa"></div><div class="field"><label>Registrierung</label><input id="registration" placeholder="z. B. D-AIXT"></div><div class="field"><label>Flughafen</label><input id="airport" placeholder="z. B. München (MUC)"></div>
+<div style="display:flex;gap:9px"><button type="button" class="secondary" style="flex:1" onclick="resetForm();showPage('dashboard')">Abbrechen</button><button class="primary" style="flex:2">Veröffentlichen</button></div></form></section>
+
+<section id="achievements" class="page">
+<div class="hero"><h1>Achievements 🏆</h1><div id="achievementSubtitle" class="muted"></div></div>
+<div class="feature-grid"><button class="feature" onclick="showSubPage('stats')"><span>📊</span><b>Statistiken</b><small>Deine Aviation-Daten</small></button><button class="feature" onclick="showSubPage('airlines')"><span>🏢</span><b>Airlines</b><small>Deine Sammlung</small></button></div>
+<div id="achList"></div><div id="statsPage" class="subpage"></div><div id="airlinesPage" class="subpage"></div>
+</section>
+</div>
+
+<nav class="nav"><button data-page="dashboard" class="active" onclick="showPage('dashboard')"><span>⌂</span>Dashboard</button><button data-page="collection" onclick="showPage('collection')"><span>▦</span>Sammlung</button><button data-page="add" onclick="resetForm();showPage('add')"><span>＋</span>Hinzufügen</button><button data-page="achievements" onclick="showPage('achievements')"><span>🏆</span>Achievements</button></nav>
+
+<div id="modal" class="modal"><div class="modalbox"><div class="modalhead"><button class="secondary" onclick="closeModal()">← Zurück</button><span id="detailTitle"></span><button class="secondary" onclick="closeModal()">✕</button></div><div id="detail"></div></div></div>
+<div id="rankModal" class="rankmodal"><div class="rankmodalbox"><div class="rankmodalhead"><b>Alle Ränge</b><button class="secondary" onclick="closeRankModal()">✕</button></div><div id="rankSlider" class="rankslider"><div id="rankTrack" class="ranktrack"></div></div><div id="rankDots" class="rankdots"></div></div></div>
+<div id="confirm" class="confirm"><div class="confirmbox"><h3 style="margin:0 0 7px">Flugzeug löschen?</h3><div class="muted">Dieser Eintrag und seine Fotos werden dauerhaft entfernt.</div><div class="confirmactions"><button class="secondary" onclick="closeConfirm()">Abbrechen</button><button class="primary" onclick="confirmDelete()">Löschen</button></div></div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const DB_NAME='AircraftCollectionV8DB',DB_VERSION=1,STORE='aircraft';
+let db=null,items=[],editId=null,pending=[],urls=new Map(),deleteTarget=null,rankIndex=0,touchX=0,touchY=0;
+const $=id=>document.getElementById(id);
+
+document.addEventListener('click',e=>{
+  const postEl=e.target.closest('.post[data-aircraft-id]');
+  if(postEl && !e.target.closest('button,input,a')){
+    openDetail(postEl.dataset.aircraftId);
+    return;
+  }
+  const aircraftBtn=e.target.closest('[data-aircraft-detail-id]');
+  if(aircraftBtn){
+    openDetail(aircraftBtn.dataset.aircraftDetailId);
+  }
+});
+const ranks=[
+{name:'First Flight',minAircraft:1,minModels:0,minAirlines:0,minAirports:0,rarity:'COMMON',icon:'✈️',accent:'#7dd3fc'},
+{name:'Spotter',minAircraft:10,minModels:3,minAirlines:0,minAirports:0,rarity:'UNCOMMON',icon:'🔭',accent:'#86efac'},
+{name:'Aviation Enthusiast',minAircraft:25,minModels:8,minAirlines:5,minAirports:0,rarity:'RARE',icon:'🛫',accent:'#a78bfa'},
+{name:'Aircraft Hunter',minAircraft:50,minModels:15,minAirlines:10,minAirports:0,rarity:'EPIC',icon:'🎯',accent:'#f472b6'},
+{name:'Aircraft Collector',minAircraft:100,minModels:30,minAirlines:15,minAirports:0,rarity:'LEGENDARY',icon:'🏅',accent:'#fbbf24'},
+{name:'Master Spotter',minAircraft:200,minModels:50,minAirlines:25,minAirports:0,rarity:'MYTHIC',icon:'👑',accent:'#fb923c'},
+{name:'Aviation Explorer',minAircraft:350,minModels:75,minAirlines:35,minAirports:10,rarity:'MYTHIC',icon:'🌎',accent:'#2dd4bf'},
+{name:'Aviation Master',minAircraft:500,minModels:100,minAirlines:50,minAirports:15,rarity:'LEGENDARY',icon:'🏆',accent:'#f59e0b'},
+{name:'Aviation Legend',minAircraft:1000,minModels:150,minAirlines:75,minAirports:25,rarity:'MYTHIC',icon:'🌟',accent:'#f87171'}];
+
+function esc(s=''){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function jsArg(s=''){return JSON.stringify(String(s)).replace(/</g,'\\u003c')}
+function unique(k,fn=()=>true){return new Set(items.filter(fn).map(x=>String(x[k]||'').trim()).filter(Boolean)).size}
+function counts(){return{aircraft:items.length,models:unique('model'),airlines:unique('airline'),airports:unique('airport'),manufacturers:unique('manufacturer')}}
+function titleOf(x){return [x.manufacturer,x.variant].filter(Boolean).join(' ')||[x.manufacturer,x.model].filter(Boolean).join(' ')||'Unbenanntes Flugzeug'}
+
+function openLegacyDB(name){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open(name);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+function readStoreFromDB(database,name){
+  return new Promise((resolve,reject)=>{
+    if(!database.objectStoreNames.contains(name)){resolve([]);return}
+    const req=database.transaction(name,'readonly').objectStore(name).getAll();
+    req.onsuccess=()=>resolve(req.result||[]);
+    req.onerror=()=>reject(req.error);
+  });
+}
+async function importLegacyIfNeeded(){
+  const current=await getAll();
+  if(current.length)return current;
+  const legacyNames=['AircraftCollectionV7DB','AircraftCollectionV6DB','AircraftCollectionV6_1DB','AircraftCollectionV5DB','AircraftCollectionDB'];
+  for(const name of legacyNames){
+    try{
+      const legacy=await openLegacyDB(name);
+      const data=await readStoreFromDB(legacy,STORE);
+      legacy.close();
+      if(data.length){
+        for(const x of data)await put(x);
+        return await getAll();
+      }
+    }catch(e){console.warn('Legacy DB nicht lesbar:',name,e)}
+  }
+  return current;
+}
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=e=>{if(!e.target.result.objectStoreNames.contains(STORE))e.target.result.createObjectStore(STORE,{keyPath:'id'})};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+function getAll(){return new Promise((res,rej)=>{const r=db.transaction(STORE,'readonly').objectStore(STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error)})}
+function put(x){return new Promise((res,rej)=>{const r=db.transaction(STORE,'readwrite').objectStore(STORE).put(x);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
+function del(id){return new Promise((res,rej)=>{const r=db.transaction(STORE,'readwrite').objectStore(STORE).delete(id);r.onsuccess=()=>res();r.onerror=()=>rej(r.error)})}
+
+function src(id,i,p){
+  if(typeof p==='string')return p;
+  const k=id+'_'+i;
+  if(!urls.has(k))urls.set(k,URL.createObjectURL(p));
+  return urls.get(k);
+}
+function clearUrls(){urls.forEach(u=>URL.revokeObjectURL(u));urls.clear()}
+
+async function init(){
+  try{db=await openDB();items=await importLegacyIfNeeded()}
+  catch(e){console.error(e);items=[]}
+  renderFeed();renderAchievements();
+}
+function showPage(id){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  $(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.toggle('active',x.dataset.page===id));
+  closeSubPages();
+  if(id==='dashboard')renderFeed();
+  if(id==='collection')renderCollection();
+  if(id==='achievements')renderAchievements();
+  window.scrollTo(0,0);
+}
+function stats(){const photos=items.reduce((n,x)=>n+(x.photos||[]).length,0);$('aircraftCount').textContent=items.length;$('photoCount').textContent=photos;$('countTop').textContent=items.length+' Aircraft'}
+function post(x){return `<article class="post" data-aircraft-id="${esc(x.id)}"><div class="photos">${x.photos?.length?x.photos.map((p,i)=>`<img src="${src(x.id,i,p)}" loading="lazy">`).join(''):'<div class="placeholder"></div>'}<span class="dots">${x.photos?.length||0} 📷</span></div><div class="postbody"><b>${esc(titleOf(x))}</b><div class="sub">${esc(x.airline||'')}</div><div class="tap">Tippen für Details →</div></div></article>`}
+function renderCollection(){
+  stats();clearUrls();
+  const a=[...items].sort((x,y)=>(y.created||0)-(x.created||0));
+  $('resultCount').textContent=a.length+' Aircraft';
+  $('collectionContent').innerHTML=a.length?`<div class="grid">${a.flatMap(x=>(x.photos||[]).map((p,i)=>`<button onclick="openDetail(${jsArg(x.id)})"><img src="${esc(src(x.id,i,p))}" loading="lazy" alt=""><span class="gridlabel">${esc(titleOf(x))}</span></button>`)).join('')}</div>`:'<div class="empty">Noch keine Flugzeuge.</div>';
+}
+
+function previewFiles(e){
+  pending.forEach(p=>{if(p.url?.startsWith('blob:')&&!p.blob)URL.revokeObjectURL(p.url)});
+  pending=[...e.target.files].map(file=>({file,url:URL.createObjectURL(file)}));
+  renderPreview();
+}
+function renderPreview(){$('preview').innerHTML=pending.map((p,i)=>`<div class="thumb"><img src="${esc(p.url)}" alt=""><button type="button" onclick="removePending(${i})">×</button></div>`).join('')}
+function removePending(i){
+  const p=pending[i];
+  if(p?.url?.startsWith('blob:')&&!p.blob)URL.revokeObjectURL(p.url);
+  pending.splice(i,1);renderPreview();
+}
+
+async function publish(e){
+  e.preventDefault();
+  const vals={};
+  ['manufacturer','model','variant','airline','registration','airport'].forEach(k=>vals[k]=$(k).value.trim());
+  if(!pending.length&&!Object.values(vals).some(Boolean)){toast('Bitte mindestens ein Foto oder eine Angabe hinzufügen.');return}
+  const b=e.submitter;b.disabled=true;b.textContent='Speichern…';
+  try{
+    const old=editId&&items.find(x=>x.id===editId);
+    const photos=[];
+    for(const p of pending)photos.push(p.file||p.blob);
+    const x={id:editId||crypto.randomUUID(),created:old?.created||Date.now(),photos,...vals};
+    if(old)items[items.findIndex(y=>y.id===editId)]=x;else items.push(x);
+    await put(x);
+    resetForm();showPage('dashboard');
+    toast(old?'Flugzeug erfolgreich gespeichert!':'Flugzeug erfolgreich veröffentlicht!');
+  }catch(err){console.error(err);toast('Speichern fehlgeschlagen. Bitte erneut versuchen.')}
+  finally{b.disabled=false;b.textContent='Veröffentlichen'}
+}
+function resetForm(){
+  pending.forEach(p=>{if(p.url?.startsWith('blob:')&&!p.blob)URL.revokeObjectURL(p.url)});
+  pending=[];editId=null;$('aircraftForm').reset();$('preview').innerHTML='';$('formTitle').textContent='Neues Flugzeug';
+}
+function openDetail(id){
+  const x=items.find(y=>y.id===id);if(!x)return;
+  clearUrls();$('detailTitle').textContent=titleOf(x);
+  $('detail').innerHTML=`<div class="detailphotos">${(x.photos||[]).map((p,i)=>`<img src="${esc(src(x.id,i,p))}" alt="">`).join('')}</div><div class="detailbody"><h2 style="margin-top:0">${esc(titleOf(x))}</h2><div class="chips">${[['Airline',x.airline],['Registrierung',x.registration],['Flughafen',x.airport],['Hersteller',x.manufacturer],['Modell',x.model],['Variante',x.variant]].filter(a=>a[1]).map(a=>`<span class="chip"><b>${a[0]}</b><br>${esc(a[1])}</span>`).join('')}</div><div class="actions"><button class="secondary" onclick="editItem(${jsArg(x.id)})">✏️ Bearbeiten</button><button class="secondary danger" onclick="askDelete(${jsArg(x.id)})">🗑️ Löschen</button></div></div>`;
+  $('modal').classList.add('show');
+}
+function closeModal(){$('modal').classList.remove('show');clearUrls()}
+function editItem(id){
+  const x=items.find(y=>y.id===id);if(!x)return;
+  closeModal();editId=id;$('formTitle').textContent='Flugzeug bearbeiten';
+  ['manufacturer','model','variant','airline','registration','airport'].forEach(k=>$(k).value=x[k]||'');
+  pending=(x.photos||[]).map(p=>({blob:p,url:typeof p==='string'?p:URL.createObjectURL(p)}));
+  renderPreview();showPage('add');
+}
+function askDelete(id){deleteTarget=id;$('confirm').classList.add('show')}
+function closeConfirm(){deleteTarget=null;$('confirm').classList.remove('show')}
+async function confirmDelete(){
+  if(!deleteTarget)return;
+  try{const id=deleteTarget;await del(id);items=items.filter(x=>x.id!==id);closeConfirm();closeModal();clearUrls();renderFeed();renderCollection();renderAchievements();toast('Flugzeug gelöscht')}
+  catch(e){console.error(e);toast('Löschen fehlgeschlagen')}
+}
+function toast(m){const t=$('toast');t.textContent='✓ '+m;t.classList.add('show');clearTimeout(window._t);window._t=setTimeout(()=>t.classList.remove('show'),2800)}
+
+function rankIndexNow(){
+  const c=counts();let i=-1;
+  ranks.forEach((r,n)=>{if(c.aircraft>=r.minAircraft&&c.models>=r.minModels&&c.airlines>=r.minAirlines&&c.airports>=r.minAirports)i=n});
+  return Math.max(0,i);
+}
+function reqs(r){
+  const c=counts();
+  return [['Aircraft',c.aircraft,r.minAircraft],['Modelle',c.models,r.minModels],['Airlines',c.airlines,r.minAirlines],['Flughäfen',c.airports,r.minAirports]]
+  .filter(x=>x[2]>0).map(x=>{const d=x[1]>=x[2];return `<div class="req ${d?'done':''}" style="--rank-accent:${r.accent}"><span>${x[0]}</span><span>${Math.min(x[1],x[2])} / ${x[2]} ${d?'<span class="check">✓</span>':''}</span></div>`}).join('');
+}
+function rankDate(i){
+  const r=ranks[i],ordered=[...items].sort((a,b)=>(a.created||0)-(b.created||0));
+  for(let j=0;j<ordered.length;j++){
+    const a=ordered.slice(0,j+1),c={aircraft:a.length,models:new Set(a.map(x=>x.model).filter(Boolean)).size,airlines:new Set(a.map(x=>x.airline).filter(Boolean)).size,airports:new Set(a.map(x=>x.airport).filter(Boolean)).size};
+    if(c.aircraft>=r.minAircraft&&c.models>=r.minModels&&c.airlines>=r.minAirlines&&c.airports>=r.minAirports)return new Date(ordered[j].created);
+  }
+  return null;
+}
+function rankCard(r,i){
+  const now=rankIndexNow(),cur=i===now,passed=i<now,d=passed?rankDate(i):null;
+  return `<div class="rankcard" style="--rank-accent:${r.accent};background:linear-gradient(145deg,var(--card),${r.accent}0d);border-color:${r.accent}55"><div class="rankicon">${r.icon}</div><div class="rankpill" style="border-color:${r.accent};color:${r.accent}">${r.rarity}</div><h2>${esc(r.name)} ${cur?'· CURRENT':''}</h2><div class="muted">${passed?'BESTANDEN ✓':cur?'Dein aktueller Rang':'Noch nicht erreicht'}</div>${d?`<div class="small">Erreicht am ${d.toLocaleDateString('de-DE')}</div>`:''}<h3>Anforderungen</h3>${reqs(r)}</div>`;
+}
+function openRankModal(){rankIndex=rankIndexNow();renderRank();$('rankModal').classList.add('show')}
+function closeRankModal(){$('rankModal').classList.remove('show')}
+function renderRank(){$('rankTrack').innerHTML=ranks.map(rankCard).join('');$('rankTrack').style.transform=`translateX(-${rankIndex*100}%)`;$('rankDots').innerHTML=ranks.map((r,i)=>`<i class="${i===rankIndex?'active':''}" style="${i===rankIndex?'background:'+r.accent:''}"></i>`).join('')}
+function moveRank(d){rankIndex=Math.max(0,Math.min(ranks.length-1,rankIndex+d));renderRank()}
+$('rankSlider').addEventListener('touchstart',e=>{touchX=e.changedTouches[0].clientX;touchY=e.changedTouches[0].clientY},{passive:true});
+$('rankSlider').addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchX,dy=e.changedTouches[0].clientY-touchY;if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy))moveRank(dx<0?1:-1)},{passive:true});
+
+function renderAchievements(){
+  const c=counts(),i=rankIndexNow(),r=ranks[i],next=ranks[i+1];
+  $('achievementSubtitle').textContent=`Current Rank: ${r.name} · ${c.aircraft} Aircraft · ${c.models} Modelle · ${c.airlines} Airlines`;
+  const box=`<button class="rankbox" onclick="openRankModal()" style="--rank-accent:${r.accent};background:linear-gradient(145deg,var(--card),${r.accent}10);border-color:${r.accent}55;width:calc(100% - 36px);color:inherit;text-align:left"><span class="rankaccent" style="background:${r.accent}"></span><div class="small">CURRENT RANK · ALLE RÄNGE ANSEHEN</div><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="rankpill" style="border-color:${r.accent};color:${r.accent}">${r.rarity}</div><h2>${r.icon} ${esc(r.name)}</h2><div class="muted">${c.aircraft} Aircraft · ${c.models} Modelle · ${c.airlines} Airlines</div></div><b style="font-size:24px">›</b></div>${next?`<div class="bar"><i style="width:${Math.min(100,c.aircraft/next.minAircraft*100)}%;background:${r.accent}"></i></div><div class="small">${c.aircraft} / ${next.minAircraft} Aircraft bis ${esc(next.name)}</div>`:''}</button>`;
+  const q=[['First Flight','Fotografiere dein erstes Aircraft','Common',c.aircraft,1],['Aircraft Collector','Sammle 10 Aircraft','Common',c.aircraft,10],['Airline Hunter','10 verschiedene Airlines','Uncommon',c.airlines,10],['Airbus Collector','10 verschiedene Airbus-Modelle','Rare',unique('model',x=>String(x.manufacturer||'').toLowerCase()==='airbus'),10],['Boeing Hunter','10 verschiedene Boeing-Modelle','Rare',unique('model',x=>String(x.manufacturer||'').toLowerCase()==='boeing'),10],['Spotter 50','Sammle 50 Aircraft','Epic',c.aircraft,50],['Collector 100','Sammle 100 Aircraft','Legendary',c.aircraft,100],['Aviation Legend','Sammle 500 Aircraft','Mythic',c.aircraft,500],['Model Explorer','Sammle 50 verschiedene Modelle','Mythic',c.models,50]];
+  $('achList').innerHTML=box+'<div class="questtitle">QUESTS</div>'+q.map(x=>{const d=x[3]>=x[4],p=Math.min(100,x[3]/x[4]*100);return `<div class="ach ${d?'':'locked'}"><div style="display:flex;justify-content:space-between"><b>${d?'🏆':'○'} ${x[0]}</b><span class="rarity">${x[2]}</span></div><div class="small">${x[1]}</div><div class="bar"><i style="width:${p}%;background:${r.accent}"></i></div><div class="small">${Math.min(x[3],x[4])}/${x[4]}</div></div>`}).join('');
+}
+
+function closeSubPages(){
+  clearUrls();
+  $('statsPage').classList.remove('show');
+  $('airlinesPage').classList.remove('show');
+  $('achList').style.display='';
+}
+function showSubPage(type){
+  closeSubPages();
+  $('achList').style.display='none';
+  if(type==='stats'){renderStats();$('statsPage').classList.add('show')}
+  if(type==='airlines'){renderAirlines();$('airlinesPage').classList.add('show')}
+  window.scrollTo(0,0);
+}
+function modelLabel(x){return [x.manufacturer,x.variant].filter(Boolean).join(' ')||x.model||'Aircraft'}
+function airlineCode(name){
+  const key=String(name||'').trim().toLowerCase();
+  const known={'lufthansa':'LH','japan airlines':'JL','singapore airlines':'SQ','emirates':'EK','qatar airways':'QR','british airways':'BA','air france':'AF','klm':'KL','united airlines':'UA','american airlines':'AA','delta air lines':'DL','delta':'DL','turkish airlines':'TK','ana':'NH','all nippon airways':'NH','cathay pacific':'CX','korean air':'KE'};
+  if(known[key])return known[key];
+  return String(name||'').trim().split(/\s+/).map(x=>x[0]).join('').slice(0,3).toUpperCase()||'—';
+}
+function firstPhoto(a){return a?.photos?.length?src(a.id,0,a.photos[0]):''}
+
+function renderStats(){
+  const c=counts(),mc={},ac={};
+  items.forEach(x=>{const m=[x.manufacturer,x.model].filter(Boolean).join(' ');if(m)mc[m]=(mc[m]||0)+1;if(x.airport)ac[x.airport]=(ac[x.airport]||0)+1});
+  const most=Object.entries(mc).sort((a,b)=>b[1]-a[1]),top=most.length?most.filter(x=>x[1]===most[0][1]):[],air=Object.entries(ac).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  $('statsPage').innerHTML=`<div class="subhead"><button class="secondary" onclick="closeSubPages()">← Achievements</button><h2>Statistiken</h2></div><div class="metric-grid"><div class="metric"><div class="small">Aircraft</div><div class="num">${c.aircraft}</div></div><div class="metric"><div class="small">Modelle</div><div class="num">${c.models}</div></div><div class="metric"><div class="small">Airlines</div><div class="num">${c.airlines}</div></div><div class="metric"><div class="small">Hersteller</div><div class="num">${c.manufacturers}</div></div><div class="metric"><div class="small">Flughäfen</div><div class="num">${c.airports}</div></div></div><div class="section-label">MOST SPOTTED</div><div class="most">${top.length?top.map(x=>`<div class="mostline"><b>🏆 ${esc(x[0])}</b><strong>${x[1]}×</strong></div>`).join(''):'<div class="muted">Noch keine Modelldaten vorhanden.</div>'}</div><div class="section-label">TOP AIRPORTS</div><div class="most">${air.length?air.map(x=>`<div class="mostline"><b>🛬 ${esc(x[0])}</b><strong>${x[1]} Aircraft</strong></div>`).join(''):'<div class="muted">Noch keine Flughafendaten vorhanden.</div>'}</div>`;
+}
+
+function openAirline(name){
+  clearUrls();
+  const arr=items.filter(x=>String(x.airline||'').trim()===name).sort((a,b)=>(b.created||0)-(a.created||0));
+  const models={};arr.forEach(x=>{const m=x.model||x.variant||'Unknown';models[m]=(models[m]||0)+1});
+  const fleet=Object.entries(models).sort((a,b)=>b[1]-a[1]),code=airlineCode(name);
+  const photos=arr.flatMap(x=>(x.photos||[]).map((p,i)=>({x,p,i})));
+  $('airlinesPage').innerHTML=`<div class="subhead"><button class="secondary" onclick="renderAirlines()">← Airlines</button><h2>${esc(code)}</h2></div><div class="airlinedetailhero"><div class="airlinecode">${esc(code)}</div><h2>${esc(name)}</h2><div class="big">${arr.length} Aircraft · ${new Set(arr.map(x=>x.model).filter(Boolean)).size} Modelle</div><div style="margin-top:16px" class="collectionlabel">YOUR FLEET</div><div class="fleet">${fleet.length?fleet.map(x=>`<span class="fleetchip"><b>${esc(x[0])}</b> ×${x[1]}</span>`).join(', '):'<span class="muted">Keine Modelldaten</span>'}</div></div><div class="collectionlabel">YOUR PHOTOS</div>${photos.length?`<div class="grid">${photos.map(({x,p,i})=>`<button onclick="openDetail(${jsArg(x.id)})"><img src="${esc(src(x.id,i,p))}" loading="lazy" alt=""><span class="gridlabel">${esc(modelLabel(x))}</span></button>`).join('')}</div>`:'<div class="empty">Noch keine Fotos für diese Airline.</div>'}`;
+  $('airlinesPage').classList.add('show');window.scrollTo(0,0);
+}
+function renderAirlines(){
+  clearUrls();
+  const map={};
+  items.forEach(x=>{const name=String(x.airline||'').trim();if(!name)return;if(!map[name])map[name]={items:[],models:new Set};map[name].items.push(x);if(x.model)map[name].models.add(x.model)});
+  const a=Object.entries(map).sort((x,y)=>y[1].items.length-x[1].items.length||x[0].localeCompare(y[0]));
+  const hero=a[0];
+  const heroPhoto=hero?firstPhoto(hero[1].items[0]):'';
+  const heroHtml=hero?`<button type="button" class="airlinehero" onclick="openAirline(${jsArg(hero[0])})" aria-label="${esc(hero[0])} öffnen"><div class="airlineheroimg">${heroPhoto?`<img src="${esc(heroPhoto)}" loading="eager" alt="">`:'<div class="airlineheroempty">✈</div>'}<div class="shade"></div><div class="airlineheroinfo"><div class="airlinecode">MOST COLLECTED · ${esc(airlineCode(hero[0]))}</div><div class="airlinename">${esc(hero[0])}</div><div class="airlineherofoot"><span><b>${hero[1].items.length}</b> Aircraft</span><span><b>${hero[1].models.size}</b> Modelle</span></div></div></div></button>`:'';
+  const cards=a.slice(hero?1:0).map(x=>{const ph=firstPhoto(x[1].items[0]);return `<button type="button" class="airlinecard" onclick="openAirline(${jsArg(x[0])})" aria-label="${esc(x[0])} öffnen"><div class="airlinecardphoto">${ph?`<img src="${esc(ph)}" loading="lazy" alt="">`:'<div class="airlinecardempty">✈</div>'}</div><div class="airlinecardbody"><span class="airlinebadge">${esc(airlineCode(x[0]))}</span><b>${esc(x[0])}</b><div class="airlinemeta">${x[1].items.length} Aircraft · ${x[1].models.size} Modelle</div></div></button>`}).join('');
+  $('airlinesPage').innerHTML=`<div class="subhead"><button class="secondary" onclick="closeSubPages()">← Achievements</button><h2>Airlines</h2></div><div class="hero" style="padding-top:0"><div class="muted">${a.length} Airlines in deiner Sammlung</div></div>${heroHtml}<div class="collectionlabel">YOUR AIRLINES</div>${cards?`<div class="airlinecards">${cards}</div>`:''}${!a.length?'<div class="empty airlineempty">Noch keine Airlines eingetragen.</div>':''}`;
+  $('airlinesPage').classList.add('show');window.scrollTo(0,0);
+}
+
+function renderMilestone(){
+  const ts=[1,10,25,50,100,200,350,500,1000],n=items.length,last=+localStorage.getItem('aircraftMilestoneV8')||0,hit=ts.filter(x=>n>=x).pop()||0;
+  if(hit>last){localStorage.setItem('aircraftMilestoneV8',hit);$('milestoneBox').innerHTML=`<div class="rankbox"><div class="small">MILESTONE</div><h2>🎉 ${hit} AIRCRAFT</h2><div class="muted">Neuer Sammlung-Meilenstein erreicht!</div></div>`;setTimeout(()=>$('milestoneBox').innerHTML='',3500)}
+  else $('milestoneBox').innerHTML='';
+}
+init();
+</script>
+</body>
+</html>
